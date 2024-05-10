@@ -3,7 +3,6 @@ export class ProfileElses{
     lastName:string = ""
     username:string = ""
 
-
     constructor(item:any){
         const keys = Object.keys(this)
         let validItems:ProfileElses = this

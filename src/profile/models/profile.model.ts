@@ -1,9 +1,9 @@
+
 export class Profile{
     firstName:string = ""
     lastName:string = ""
     email:string = ""
     username:string = ""
-
 
     constructor(item:any){
         const keys = Object.keys(this)

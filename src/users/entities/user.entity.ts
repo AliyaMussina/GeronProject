@@ -14,20 +14,18 @@ export class User extends AbstractEntity<User> {
 
     @Column()
     email:string
-//ключ уникальности добавили
-    @Column({unique: true})
+
+    @Column({unique:true})
     username:string
 
     @Column()
     password:string
 
-  
+    @OneToMany(() => Task, (tasks) => tasks.user)
+    @JoinTable()
+    tasks: Task[]
 
     @OneToMany(() => Role, (role) => role.user)
     @JoinTable()
     roles: Role[]
-
-    @OneToMany(() => Task, (tasks) => tasks.user)
-    @JoinTable()
-    tasks: Task[]
 }

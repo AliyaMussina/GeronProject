@@ -11,9 +11,9 @@ export class Project extends AbstractEntity<Project> {
 
     @OneToMany(() => Task, (tasks) => tasks.project)
     @JoinTable()
-    tasks: Task[];
+    tasks: Task[]
 
     @OneToMany(() => Role, (role) => role.project)
     @JoinTable()
-    roles: Role[];
+    roles: Role[]
 }

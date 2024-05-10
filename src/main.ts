@@ -4,7 +4,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors:true
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Geron')
@@ -15,9 +17,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  // добавили валидацию внутрь нашего приложения
-  app.useGlobalPipes(new ValidationPipe());
-  // запуск сервер на 3000 порту
+
+  app.useGlobalPipes(new ValidationPipe())
+
   await app.listen(3000);
 }
 bootstrap();

@@ -3,21 +3,20 @@ import { User } from "src/users/entities/user.entity";
 import { Column, Entity, JoinTable, ManyToOne } from "typeorm";
 import { Project } from "./project.entity";
 
-
-export enum RoLesProject{
-    admin = 'ADMIN',
-    worker = 'WORKER',
+export enum RolesProject{
+    admin = "ADMIN",
+    worker = "WORKER"
 }
 
 @Entity()
-export class Role extends AbstractEntity<Role> {
+export class Role extends AbstractEntity<Role>{
     @Column()
-    role:RoLesProject;
-    
-    @ManyToOne(()=> User, (user) => user.roles)
-    user:User;
+    role:RolesProject
 
-    @ManyToOne(()=> Project, (project) => project.roles)
+    @ManyToOne(() => User, (user) => user.roles)
+    user: User
+
+    @ManyToOne(() => Project, (project) => project.roles)
     @JoinTable()
-    project:Project;
+    project: Project
 }
