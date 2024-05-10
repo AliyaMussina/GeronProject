@@ -13,6 +13,7 @@ export class ProjectsController {
 
   @Post()
   create(
+    //будет хранится пользователь с токеном
     @Request() req:AuthRequest,
     @Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(req.user, createProjectDto);

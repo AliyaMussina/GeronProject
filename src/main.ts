@@ -15,9 +15,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  
+  // добавили валидацию внутрь нашего приложения
   app.useGlobalPipes(new ValidationPipe());
-
+  // запуск сервер на 3000 порту
   await app.listen(3000);
 }
 bootstrap();

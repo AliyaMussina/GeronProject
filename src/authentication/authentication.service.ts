@@ -34,7 +34,7 @@ export class AuthenticationService {
 
     const payload:TokenData = {id:user.id}
     const token = await this.jwtService.signAsync(payload)
-
+//фронту json отпр вместо строки
     return JSON.stringify(token);
   }
   async signUp(signUp: CreateUserDto) {
