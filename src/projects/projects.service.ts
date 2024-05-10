@@ -24,16 +24,18 @@ export class ProjectsService {
     @InjectRepository(Role)
     private readonly rolesRepository: Repository<Role>
   ) { }
-
+//формируем пользователя
   async create(tokenData: TokenData, createProjectDto: CreateProjectDto) {
     const user = await this.userRepository.findOne({
       where: {
         id: tokenData.id
       }
     })
+    //формируем проект 
     const project = new Project(createProjectDto)
 
     await this.projectRepository.save(project)
+    //формируем новую роль 
     await this.rolesRepository.save({
       user,
       project,
