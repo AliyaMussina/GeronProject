@@ -11,9 +11,6 @@ import { GetParticipantsResponse } from './response/get-participants-response';
 
 @Injectable()
 export class ProjectsService {
-  rolesprojectRepository: any;
-  rolesProjectRepository: any;
-
   constructor(
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
@@ -22,7 +19,7 @@ export class ProjectsService {
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(Role)
-    private readonly rolesRepository: Repository<Role>
+    private readonly rolesProjectRepository: Repository<Role>
   ) { }
 //формируем пользователя
   async create(tokenData: TokenData, createProjectDto: CreateProjectDto) {
@@ -36,7 +33,7 @@ export class ProjectsService {
 
     await this.projectRepository.save(project)
     //формируем новую роль 
-    await this.rolesRepository.save({
+    await this.rolesProjectRepository.save({
       user,
       project,
       role: RolesProject.admin
@@ -55,7 +52,7 @@ export class ProjectsService {
       }
     })
   }
-  // отображает всех участников проектов кот находятся в проекте 
+  // отображает всех участников проектов кто не находятся в проекте 
   async findParticipants(projectId: string) {
     const users = await this.userRepository.find({
       relations: {
@@ -80,9 +77,9 @@ export class ProjectsService {
 
 
   }
-  //отображает всех участников проектов кот не находятся в проекте 
+  //отображает всех участников проектов кто находятся в проекте 
   async findMembers(projectId: string) {
-    return this.rolesRepository.find({
+    return this.rolesProjectRepository.find({
       where: {
         project: {
           id: projectId
@@ -107,7 +104,7 @@ export class ProjectsService {
     tokenData: TokenData,
     dto: AddedUserToProjectDTO, 
   ){
-    const user = await this.rolesRepository.findOne({
+    const user = await this.rolesProjectRepository.findOne({
       where:{
         user:{
           id: tokenData.id,
@@ -121,6 +118,7 @@ export class ProjectsService {
       throw new HttpException(
         'У вас недостаточно прав, чтоб добавить пользователей в проект',
         HttpStatus.CONFLICT,
+        
       );
     }
 
@@ -139,6 +137,43 @@ export class ProjectsService {
     user:member,
     project: project,
   });
-  return 'Пользователь ${dto.username} добавлен';
+  return `Пользователь ${dto.username} добавлен`;
 }
+  //метод для обновления данных проекта
+  //сохраняем новое название если оно есть 
+  //находим пользователя и создаем ему связь с этим проектом с ролью worker
+  async update(projectId:string, updateProjectDto:UpdateProjectDto){
+    if (UpdateProjectDto.name){
+      await this.projectRepository.save({
+        id:projectId,
+        name:updateProjectDto.name,
+      });
+    }
+    for (const userName of updateProjectDto.users){
+      const user=await this.userRepository.findOne({
+        where:{
+          username:userName,
+        },
+      });
+      // проверка если пользователь уже существует, если пользоваль уже связан с этим проектом то удаляем 
+      const checkUserCreated = await this.rolesProjectRepository.findOne({
+        where:{
+          user:{
+            id:user.id,
+          },
+          project:{
+            id:projectId,
+          },
+        },
+      });
+      if (checkUserCreated) continue;
+      
+      await this.rolesProjectRepository.save({
+        user:{id:user.id},
+        project:{id:projectId},
+        role:RolesProject.worker,
+      });
+    }
+    return JSON.stringify('Проект обновлен')
+  }
 }

@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetProjectFindAllResponse } from './response/get-project-find-all.response';
 import { GetParticipantsResponse } from './response/get-participants-response';
 import { GetMembersResponse } from './response/get-members-response';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @ApiTags('Projects')
 @ApiBearerAuth()
@@ -31,7 +32,7 @@ export class ProjectsController {
   }
   // 
   @ApiOkResponse({type: GetParticipantsResponse})
-  @Get(':id/participants')
+  @Get(':id/members')
   findMembers(@Param('id') id:string){
     return this.projectsService.findMembers(id)
   }
@@ -44,5 +45,10 @@ export class ProjectsController {
     @Body() dto: AddedUserToProjectDTO, 
   ){
     return this.projectsService.AddedUserToProject(id, req.user, dto);
+  }
+  //
+  @Patch(':id')
+  update(@Param('id') id:string, @Body() updateProjectDto:UpdateProjectDto) {
+    return this.projectsService.update(id, updateProjectDto)
   }
 }

@@ -1,4 +1,11 @@
+import { IsAlpha, IsOptional, IsString } from "class-validator";
+
 export class GetTasksFilterDto{
-    userId?:string
-    projectId?:string
+    @IsOptional()
+    @IsAlpha()
+    username?:string;
+
+    @IsOptional()
+    @IsString()
+    projectId?:string;
 }

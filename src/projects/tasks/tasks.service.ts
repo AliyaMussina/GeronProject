@@ -19,45 +19,58 @@ export class TasksService {
         private readonly projectRepository: Repository<Project>
     ){}
 
-    async create(createTaskDto:CreateTaskDto){
+    async create(tokenData:TokenData, createTaskDto:CreateTaskDto){
         const task = new Task(createTaskDto)
 
-        task.user = await this.userRepository.findOne({
+        task.user = await this.userRepository.findOne(
+            createTaskDto.username
+            ? {
             where: {
-                id: createTaskDto.userID
-            }
-        })
+                username: createTaskDto.username,
+            },
+        }
+    :{
+        where: {
+            id:tokenData.id,
+        },
+    },
+);
         task.project = await this.projectRepository.findOne({
             where: {
-                id: createTaskDto.projectID
+                id: createTaskDto.projectId
             }
-        })
+        });
 
-        await this.taskRepository.save({...task, status: TaskStatus.create})
+        await this.taskRepository.save({...task, status: TaskStatus.create});
 
         return "Задача добавлена в проект"
     }
-
-    async findAll(filters:GetTasksFilterDto){
+//ищет все задачи, внутри всех проектов
+    async findAll(filters:GetTasksFilterDto, tokenData?:TokenData){
         let where:FindOptionsWhere<Task> = {}
-        if(filters.userId){
-            where = {...where, user: {id: filters.userId}}
+        //либо задача user либо token 
+        if(filters.username || tokenData){
+            where = {...where, 
+                user: tokenData? {id: tokenData.id} : {username: filters.username},
+            };
         }
         if(filters.projectId){
             where = {...where, project: {id: filters.projectId}}
         }
         return this.taskRepository.find({
             relations:{
-                user:true,
                 project:true
             },
-            order:{
-                title: 'ASC'
+            select:{
+                user:{
+                    firstName:true,
+                    lastName:true,
+                    username:true,
+                },
             },
-            where:where
+            where,              
         })
     }
-
     async update(id:string, updateTaskDto: UpdateTaskDto){
         const task = new Task(updateTaskDto)
         await this.taskRepository.save({id, ...task})
